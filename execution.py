@@ -75,7 +75,7 @@ results = st.multiselect('Select Result', results, default='All Results')
 yakker = yakker[(yakker['Result'].isin(results) | ('All Results' in results))]
 
 def executed(PlateLocSide, PlateLocHeight, calledLoc):
-    if -17/24 < PlateLocSide < 17/24 and 18/12 < PlateLocHeight < 42/12:
+    if -17/24 < PlateLocSide < 17/24 and 5/4 < PlateLocHeight < 3:
         if calledLoc == 1:
             if PlateLocSide > 0 and PlateLocHeight < 17/8:
                 return True
