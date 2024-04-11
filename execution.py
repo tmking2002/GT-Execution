@@ -60,8 +60,8 @@ yakker = yakker[(yakker['PlateLocSide'] > -2) & (yakker['PlateLocSide'] < 2) & (
 yakker['Result'] = yakker['PitchCall']
 
 # if result is InPlay, change to HardHit if exit speed > 67.5
-yakker.loc[(yakker['Result'] == 'InPlay') & (yakker['ExitSpeed'] > 67.5), 'Result'] = 'Hard Hit'
-yakker.loc[(yakker['Result'] == 'InPlay') & (yakker['Result'] != "Hard Hit"), 'Result'] = 'Soft Contact'
+yakker.loc[(yakker['Result'] == 'InPlay') & ((yakker['ExitSpeed'] > 67.5) | (yakker['PlayResult'] == 'Home Run')), 'Result'] = 'Hard Hit'
+yakker.loc[(yakker['Result'] == 'InPlay') & (yakker['ExitSpeed'] < 67.5), 'Result'] = 'Soft Contact'
 
 yakker['HardHit'] = yakker['Result'].apply(lambda x: 1 if x == 'Hard Hit' else 0)
 yakker['SoftContact'] = yakker['Result'].apply(lambda x: 1 if x == 'Soft Contact' else 0)
