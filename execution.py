@@ -39,6 +39,7 @@ games = st.multiselect('Select Game', games, default='All Games')
 
 yakker = yakker[(yakker['Pitcher'] == pitcher) & ((yakker['Game'].isin(games)) | ('All Games' in games))]
 yakker['calledLoc'] = round(pd.to_numeric(yakker['calledLoc'], errors='coerce'), 0)
+yakker.loc[yakker['TaggedPitchType'] == 'Changeup', 'calledLoc'] = 0
 yakker = yakker.dropna(subset=['TaggedPitchType', 'calledLoc', 'PitchCall'])
 yakker['calledLoc'] = yakker['calledLoc'].astype(int)
 yakker = yakker[yakker['calledLoc'] != 6]
@@ -60,8 +61,7 @@ yakker['Result'] = yakker['PitchCall']
 
 # if result is InPlay, change to HardHit if exit speed > 67.5
 yakker.loc[(yakker['Result'] == 'InPlay') & (yakker['ExitSpeed'] > 67.5), 'Result'] = 'Hard Hit'
-yakker.loc[(yakker['Result'] == 'InPlay') & (yakker['ExitSpeed'] > 67.5) & (yakker['Angle'] < 35) & (yakker['Angle'] > 15), 'Result'] = 'Barrel'
-yakker.loc[(yakker['Result'] == 'InPlay'), 'Result'] = 'Soft Contact'
+yakker.loc[(yakker['Result'] == 'InPlay') & (yakker['Result'] != "Hard Hit"), 'Result'] = 'Soft Contact'
 
 yakker['HardHit'] = yakker['Result'].apply(lambda x: 1 if x == 'Hard Hit' else 0)
 yakker['SoftContact'] = yakker['Result'].apply(lambda x: 1 if x == 'Soft Contact' else 0)
@@ -105,7 +105,7 @@ scatter = alt.Chart(yakker).mark_circle(size=100).encode(
     alt.X('PlateLocSide', axis=alt.Axis(labels=False, ticks=False, title='')),
     alt.Y('PlateLocHeight', axis=alt.Axis(labels=False, ticks=False, title='')),
     color='Pitch',
-    tooltip=['Pitch', 'Spot', 'Result', 'Exit Velo', 'Executed']
+    tooltip=['Pitch', 'Spot', 'Result', 'Exit Velo', 'Executed', 'Game']
 )
 
 # Define the lines
@@ -167,11 +167,22 @@ combined_chart = scatter + k_zone_chart + batter_box_1_chart + batter_box_2_char
 
 st.altair_chart(combined_chart)
 
-executed_pct = round(yakker['Executed'].mean() * 100, 1)
-hard_hit_pct = round((yakker['HardHit'].sum() / (yakker['HardHit'].sum() + yakker['SoftContact'].sum())) * 100, 1)
-whiff_pct = round(yakker[yakker['Result'] == 'StrikeSwinging'].shape[0] / (yakker[yakker['Result'] == 'StrikeSwinging'].shape[0] + yakker[yakker['Result'] == 'Foul'].shape[0] + 
-                                                                           yakker[yakker['Result'] == 'Soft Contact'].shape[0] + yakker[yakker['Result'] == 'Hard Hit'].shape[0]) * 100, 1)
+no_change = yakker[yakker['Spot'] != 0]
 
+executed_pct = round(no_change['Executed'].mean() * 100, 1)
+
+if(yakker['HardHit'].sum() + yakker['SoftContact'].sum()) == 0:
+    hard_hit_pct = 0
+else:
+    hard_hit_pct = round((yakker['HardHit'].sum() / (yakker['HardHit'].sum() + yakker['SoftContact'].sum())) * 100, 1)
+
+
+if(yakker[yakker['Result'] == 'StrikeSwinging'].shape[0] + yakker[yakker['Result'] == 'Foul'].shape[0] + yakker[yakker['Result'] == 'Soft Contact'].shape[0] + yakker[yakker['Result'] == 'Hard Hit'].shape[0]) == 0:
+    whiff_pct = 0
+else:
+    whiff_pct = round(yakker[yakker['Result'] == 'StrikeSwinging'].shape[0] / (yakker[yakker['Result'] == 'StrikeSwinging'].shape[0] + yakker[yakker['Result'] == 'Foul'].shape[0] + 
+                                                                           yakker[yakker['Result'] == 'Soft Contact'].shape[0] + yakker[yakker['Result'] == 'Hard Hit'].shape[0]) * 100, 1)
+    
 st.write(f'Executed: {executed_pct}%')
 st.write(f'Hard Hit: {hard_hit_pct}%')
 st.write(f'Whiff: {whiff_pct}%')
