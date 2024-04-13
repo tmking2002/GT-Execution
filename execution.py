@@ -106,7 +106,7 @@ scatter = alt.Chart(yakker).mark_circle(size=100).encode(
     alt.X('PlateLocSide', axis=alt.Axis(labels=False, ticks=False, title='')),
     alt.Y('PlateLocHeight', axis=alt.Axis(labels=False, ticks=False, title='')),
     color='Pitch',
-    tooltip=['Pitch', 'Spot', 'Result', 'Exit Velo', 'Executed', 'Game']
+    tooltip=['Pitch', 'Spot', 'Result', 'Exit Velo', 'Executed', 'Batter', 'Game']
 )
 
 # Define the lines
