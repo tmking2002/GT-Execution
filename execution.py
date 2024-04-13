@@ -29,11 +29,12 @@ for file in files:
 
 yakker = yakker[yakker['PitcherTeam'] == 'Georgia tech']
 
+
 st.header('GT Pitcher Execution')
 
 pitcher = st.selectbox('Select Pitcher', yakker['Pitcher'].unique())
 
-games = yakker['Game'].unique().tolist()
+games = sorted(yakker['Game'].unique().tolist())
 games.insert(0, 'All Games')
 games = st.multiselect('Select Game', games, default='All Games')
 
@@ -164,6 +165,7 @@ horz_line_chart = alt.Chart(horz_line).mark_line(color='black', strokeDash=[5,5]
 
 # Combine scatter plot and lines
 combined_chart = scatter + k_zone_chart + batter_box_1_chart + batter_box_2_chart + vert_line_chart + horz_line_chart
+
 
 st.altair_chart(combined_chart)
 
