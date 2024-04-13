@@ -29,14 +29,13 @@ for file in files:
 
 yakker = yakker[yakker['PitcherTeam'] == 'Georgia tech']
 
+st.sidebar.header('GT Pitcher Execution')
 
-st.header('GT Pitcher Execution')
-
-pitcher = st.selectbox('Select Pitcher', yakker['Pitcher'].unique())
+pitcher = st.sidebar.selectbox('Select Pitcher', yakker['Pitcher'].unique())
 
 games = sorted(yakker['Game'].unique().tolist())
 games.insert(0, 'All Games')
-games = st.multiselect('Select Game', games, default='All Games')
+games = st.sidebar.multiselect('Select Game', games, default='All Games')
 
 yakker = yakker[(yakker['Pitcher'] == pitcher) & ((yakker['Game'].isin(games)) | ('All Games' in games))]
 yakker['calledLoc'] = round(pd.to_numeric(yakker['calledLoc'], errors='coerce'), 0)
@@ -48,11 +47,11 @@ yakker['TaggedPitchType'] = yakker['TaggedPitchType'].apply(lambda x: x.replace(
 
 pitches = sorted(yakker['TaggedPitchType'].unique())
 pitches.insert(0, 'All Pitches')
-pitches = st.multiselect('Select Pitch Type', pitches, default='All Pitches')
+pitches = st.sidebar.multiselect('Select Pitch Type', pitches, default='All Pitches')
 
 locations = sorted(yakker['calledLoc'].round().astype(int).unique())
 locations.insert(0, 'All Locations')
-locations = st.multiselect('Select Location', locations, default='All Locations')
+locations = st.sidebar.multiselect('Select Location', locations, default='All Locations')
 
 yakker = yakker[(yakker['TaggedPitchType'].isin(pitches) | ('All Pitches' in pitches)) & (yakker['calledLoc'].isin(locations) | ('All Locations' in locations))]
 
@@ -71,7 +70,7 @@ yakker['Exit Velo'] = round(yakker['ExitSpeed'], 1).fillna('')
 
 results = sorted(yakker['Result'].unique())
 results.insert(0, 'All Results')
-results = st.multiselect('Select Result', results, default='All Results')
+results = st.sidebar.multiselect('Select Result', results, default='All Results')
 
 yakker = yakker[(yakker['Result'].isin(results) | ('All Results' in results))]
 
